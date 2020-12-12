@@ -39,9 +39,9 @@ struct missing_has_next {
 struct missing_all {
 };
 
-// The tests
+// the tests
 static_assert(is_iterator_v<int_iterator, int>, "int_iterator should be an si::Iterator<int>");
-static_assert(!is_iterator_v<missing_next, int>, "missing_next lacks the next() function");
-static_assert(!is_iterator_v<missing_has_next, int>, "missing_has_next lacks the has_next() function");
-static_assert(!is_iterator_v<missing_all, int>, "missing_all has none of the si::Iterator functions");
+static_assert(!is_iterator_v<missing_next, int>, "missing_next should not be an si::Iterator<?>");
+static_assert(!is_iterator_v<missing_has_next, int>, "missing_has_next should not be an si::Iterator<?>");
+static_assert(!is_iterator_v<missing_all, int>, "missing_all should not be an si::Iterator<?>");
 static_assert(!is_iterator_v<int_iterator, float>, "int_iterator should not be an si::Iterator<float>");
