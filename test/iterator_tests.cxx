@@ -4,7 +4,7 @@
  * helper to check whether something is an iterator for a specific value type
  */
 template<typename T, typename Value>
-struct is_iterator {
+struct IsIterator {
   using true_type = char;
   using false_type = struct {
     char dummy[2];
@@ -19,29 +19,29 @@ struct is_iterator {
 };
 
 template<typename T, typename Value>
-static constexpr bool const is_iterator_v = is_iterator<T, Value>::value;
+static constexpr bool const IsIteratorV = IsIterator<T, Value>::value;
 
 // test structures to see whether the concept is working as intended
-struct int_iterator {
+struct IntIterator {
   bool has_next() const;
 
   int next();
 };
 
-struct missing_next {
+struct MissingNext {
   bool has_next() const;
 };
 
-struct missing_has_next {
+struct MissingHasNext {
   int next();
 };
 
-struct missing_all {
+struct MissingAll {
 };
 
 // the tests
-static_assert(is_iterator_v<int_iterator, int>, "int_iterator should be an si::Iterator<int>");
-static_assert(!is_iterator_v<missing_next, int>, "missing_next should not be an si::Iterator<?>");
-static_assert(!is_iterator_v<missing_has_next, int>, "missing_has_next should not be an si::Iterator<?>");
-static_assert(!is_iterator_v<missing_all, int>, "missing_all should not be an si::Iterator<?>");
-static_assert(!is_iterator_v<int_iterator, float>, "int_iterator should not be an si::Iterator<float>");
+static_assert(IsIteratorV<IntIterator, int>, "IntIterator should be an si::Iterator<int>");
+static_assert(!IsIteratorV<MissingNext, int>, "MissingNext should not be an si::Iterator<?>");
+static_assert(!IsIteratorV<MissingHasNext, int>, "MissingHasNext should not be an si::Iterator<?>");
+static_assert(!IsIteratorV<MissingAll, int>, "MissingAll should not be an si::Iterator<?>");
+static_assert(!IsIteratorV<IntIterator, float>, "IntIterator should not be an si::Iterator<float>");
