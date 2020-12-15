@@ -2,7 +2,10 @@
 
 #include <si/algorithms.hxx>
 
+#include <string>
 #include <vector>
+
+using namespace std::literals::string_literals;
 
 class IntRangeIterator final {
   int current;
@@ -47,6 +50,22 @@ TEST(AlgorithmsTests, ForEach)
   range << si::for_each<int>([&results](int n) {
     results[n-1] = n;
   });
+
+  EXPECT_EQ(results, expected);
+}
+
+TEST(AlgorithmsTests, Map)
+{
+  auto const range = IntRange{1, 5};
+
+  std::vector<std::string> results;
+  results.reserve(5u);
+  std::vector expected{"2"s, "4"s, "6"s, "8"s, "10"s};
+
+  range
+      << si::map<int, int>([](int n) { return n*2; })
+      << si::map<int, std::string>([](int n) { return std::to_string(n); })
+      << si::for_each<std::string>([&results](std::string&& s) { results.push_back(s); });
 
   EXPECT_EQ(results, expected);
 }
