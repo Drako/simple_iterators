@@ -69,3 +69,19 @@ TEST(AlgorithmsTests, Map)
 
   EXPECT_EQ(results, expected);
 }
+
+TEST(AlgorithmsTests, Filter)
+{
+  auto const range = IntRange{1, 5};
+
+  std::vector<int> results;
+  results.reserve(3u);
+  std::vector expected{6, 8, 10};
+
+  range
+      << si::map<int, int>([](int n) { return n*2; })
+      << si::filter<int>([](int n) { return n>5; })
+      << si::for_each<int>([&results](int n) { results.push_back(n); });
+
+  EXPECT_EQ(results, expected);
+}
