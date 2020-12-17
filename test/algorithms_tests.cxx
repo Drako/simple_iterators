@@ -124,11 +124,11 @@ TEST(AlgorithmsTests, DropAndTake)
 
   std::vector<int> results;
   results.reserve(5u);
-  std::vector expected{10, 11, 12, 13, 14};
+  std::vector expected{6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 
   range
-      << si::drop<int>(9)
-      << si::take<int>(5)
+      << si::drop<int>(5u)
+      << si::take<int>(10u)
       << si::for_each<int>([&results](int n) { results.push_back(n); });
 
   EXPECT_EQ(results, expected);
@@ -143,8 +143,8 @@ TEST(AlgorithmsTests, TakeAndDrop)
   std::vector expected{6, 7, 8, 9, 10};
 
   range
-      << si::take<int>(10)
-      << si::drop<int>(5)
+      << si::take<int>(10u)
+      << si::drop<int>(5u)
       << si::for_each<int>([&results](int n) { results.push_back(n); });
 
   EXPECT_EQ(results, expected);
