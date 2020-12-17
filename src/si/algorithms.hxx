@@ -132,8 +132,20 @@ namespace si {
     return detail::Map<Source, Target, M>{m};
   }
 
+  template<typename Source, typename Target, Mapper<Source, Target> M>
+  inline auto transform(M&& m)
+  {
+    return detail::Map<Source, Target, M>{m};
+  }
+
   template<typename T, Predicate<T> P>
   inline auto filter(P&& p)
+  {
+    return detail::Filter<T, P>{p};
+  }
+
+  template<typename T, Predicate<T> P>
+  inline auto copy_if(P&& p)
   {
     return detail::Filter<T, P>{p};
   }

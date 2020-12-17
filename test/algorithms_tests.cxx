@@ -70,6 +70,22 @@ TEST(AlgorithmsTests, Map)
   EXPECT_EQ(results, expected);
 }
 
+TEST(AlgorithmsTests, Transform)
+{
+  auto const range = IntRange{1, 5};
+
+  std::vector<std::string> results;
+  results.reserve(5u);
+  std::vector expected{"3"s, "6"s, "9"s, "12"s, "15"s};
+
+  range
+      << si::transform<int, int>([](int n) { return n*3; })
+      << si::map<int, std::string>([](int n) { return std::to_string(n); })
+      << si::for_each<std::string>([&results](std::string&& s) { results.push_back(s); });
+
+  EXPECT_EQ(results, expected);
+}
+
 TEST(AlgorithmsTests, Filter)
 {
   auto const range = IntRange{1, 5};
@@ -81,6 +97,22 @@ TEST(AlgorithmsTests, Filter)
   range
       << si::map<int, int>([](int n) { return n*2; })
       << si::filter<int>([](int n) { return n>5; })
+      << si::for_each<int>([&results](int n) { results.push_back(n); });
+
+  EXPECT_EQ(results, expected);
+}
+
+TEST(AlgorithmsTests, CopyIf)
+{
+  auto const range = IntRange{1, 5};
+
+  std::vector<int> results;
+  results.reserve(2u);
+  std::vector expected{2, 4};
+
+  range
+      << si::map<int, int>([](int n) { return n*2; })
+      << si::copy_if<int>([](int n) { return n<5; })
       << si::for_each<int>([&results](int n) { results.push_back(n); });
 
   EXPECT_EQ(results, expected);
