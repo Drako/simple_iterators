@@ -6,6 +6,7 @@
 #include "callables.hxx"
 #include "iterable.hxx"
 
+#include <iostream>
 #include <optional>
 
 namespace si {
@@ -118,6 +119,62 @@ namespace si {
     {
       return Filtering<T, decltype(i.iterator()), P>{i.iterator(), f.predicate};
     }
+
+    template<typename T>
+    struct DropTake final {
+      unsigned drop;
+      unsigned take;
+    };
+
+    template<typename T, Iterator<T> I>
+    struct DroppingTakingIterator {
+    private:
+      I base;
+      DropTake<T> dt;
+      unsigned current = 0u;
+
+      inline void skip()
+      {
+        while (base.has_next() && dt.drop--) {
+          (void) base.next();
+        }
+      }
+
+    public:
+      inline DroppingTakingIterator(I const& base, DropTake<T> dt)
+          :base{base}, dt{dt}
+      {
+        skip();
+      }
+
+      [[nodiscard]] inline bool has_next() const
+      {
+        return current<dt.take && base.has_next();
+      }
+
+      inline T next()
+      {
+        ++current;
+        return base.next();
+      }
+    };
+
+    template<typename T, Iterator<T> I>
+    struct DroppingTaking final {
+      I base;
+      DropTake<T> dt;
+
+      inline auto iterator()
+      {
+        return DroppingTakingIterator<T, I>{base, dt};
+      }
+    };
+
+    template<typename T, Iterable<T> I>
+    inline auto operator<<(I&& i, DropTake<T> dt)
+    {
+      return DroppingTaking<T, decltype(i.iterator())>{i.iterator(), dt};
+    }
   }
 
   template<typename T, Consumer<T> C>
@@ -148,6 +205,19 @@ namespace si {
   inline auto copy_if(P&& p)
   {
     return detail::Filter<T, P>{p};
+  }
+
+  template<typename T>
+  inline auto drop(unsigned n)
+  {
+    // technically this is not a "drop n, take all" but a "drop n, take 4.x billion", but that should be sufficient
+    return detail::DropTake<T>{n, ~0u};
+  }
+
+  template<typename T>
+  inline auto take(unsigned n)
+  {
+    return detail::DropTake<T>{0u, n};
   }
 }
 
