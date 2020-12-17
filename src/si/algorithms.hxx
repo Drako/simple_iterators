@@ -57,7 +57,7 @@ namespace si {
     }
 
     template<typename T, Iterator<T> I, Predicate<T> P>
-    struct FilteringIterator final {
+    class FilteringIterator final {
       I base;
       P predicate;
 
@@ -73,6 +73,10 @@ namespace si {
           }
         }
       }
+
+    public:
+      inline FilteringIterator(I const& base, P const& predicate)
+          :base{base}, predicate{predicate} { }
 
       [[nodiscard]] inline bool has_next()
       {
