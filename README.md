@@ -1,8 +1,10 @@
 # Simple Iterators
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 This project aims at providing an iterator mechanism inspired by Java.
 
-The iterators of the C++ standard library are rather complex an rely heavily on operator overloading.
+The iterators of the C++ standard library are rather complex and rely heavily on operator overloading.
 This library uses C++ 20 concepts to make anything iterable that has an `iterator()` member function returning
 an iterator. An iterator is anything providing the member functions `has_next()` and `next()`.
 
@@ -15,7 +17,7 @@ As of this writing GCC 10 or Clang 10 are required.
 See [C++ Compiler Support](https://en.cppreference.com/w/cpp/compiler_support)
 for further reference. **Concepts** must be supported.
 
-## Building
+## Building & Testing
 
 Other than the aforementioned compilers
 the project currently requires [CMake](https://cmake.org/download/) version *3.17* or newer.
