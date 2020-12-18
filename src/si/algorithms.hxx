@@ -185,7 +185,7 @@ namespace si {
     }
 
     template<typename T>
-    struct JustCount {
+    struct JustCount final {
     };
 
     template<typename T, Iterable<T> I>
@@ -201,7 +201,7 @@ namespace si {
     }
 
     template<typename T, Predicate<T> P>
-    struct CountFiltered {
+    struct CountFiltered final {
       P predicate;
     };
 
