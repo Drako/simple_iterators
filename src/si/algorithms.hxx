@@ -4,9 +4,10 @@
 #define SI_ALGORITHMS_HXX
 
 #include "callables.hxx"
+#include "exceptions.hxx"
 #include "iterable.hxx"
 
-#include <iostream>
+#include <limits>
 #include <optional>
 
 namespace si {
@@ -32,7 +33,10 @@ namespace si {
 
       [[nodiscard]] inline bool has_next() const { return base.has_next(); }
 
-      inline Target next() { return mapper(base.next()); }
+      inline Target next()
+      {
+        return mapper(base.next());
+      }
     };
 
     template<typename Source, typename Target, Iterator<Source> I, Mapper<Source, Target> M>
@@ -92,6 +96,8 @@ namespace si {
 
       inline T next()
       {
+        if (!has_next())
+          throw no_such_element_exception{"Called next() on empty iterator."};
         auto const result = next_cached.value();
         next_cached.reset();
         return result;
@@ -154,6 +160,8 @@ namespace si {
 
       inline T next()
       {
+        if (!has_next())
+          throw no_such_element_exception{"Called next() on empty iterator."};
         ++current;
         return base.next();
       }
@@ -211,7 +219,7 @@ namespace si {
   inline auto drop(unsigned n)
   {
     // technically this is not a "drop n, take all" but a "drop n, take 4.x billion", but that should be sufficient
-    return detail::DropTake<T>{n, ~0u};
+    return detail::DropTake<T>{n, std::numeric_limits<unsigned>::max()};
   }
 
   template<typename T>

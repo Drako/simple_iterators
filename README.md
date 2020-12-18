@@ -11,6 +11,74 @@ an iterator. An iterator is anything providing the member functions `has_next()`
 Next to the two concepts `Iterable<T>` and `Iterator<T>` this library provides a bunch of algorithms
 that are compatible with any types implementing these concepts.
 
+## Usage
+
+### Including into Git and CMake based project
+
+Add this library as a submodule and include it via `add_subdirectory()`
+into your CMake project.
+Then link everything you need is to link against the `si` target.
+
+Example:
+```shell
+git submodule add https://github.com/Drako/simple_iterators
+```
+
+Then in your CMakeLists.txt do something like this:
+```cmake
+add_subdirectory(simple_iterators)
+
+add_executable(hello main.cxx)
+target_link_libraries(hello PRIVATE si)
+```
+
+### Defining custom iterables
+
+```cpp
+/**
+ * The minimum required functions are has_next() and next().
+ * has_next() is supposed to return a bool.
+ */
+class IntRangeIterator final {
+  int current;
+  int last;
+
+public:
+  constexpr IntRangeIterator(int start, int last) noexcept
+      :current{start}, last{last} { }
+      
+  [[nodiscard]] constexpr bool has_next() const noexcept
+  {
+    return current<=last;
+  }
+
+  // in case next() is called on an empty iterator, si::no_such_element_exception should be thrown.
+  constexpr int next()
+  {
+    if (!has_next())
+      throw si::no_such_element_exception{"Called next() on empty iterator."};
+    return current++;
+  }
+};
+
+/**
+ * The minimum required function is iterator().
+ */
+class IntRange {
+  int from;
+  int to;
+
+public:
+  constexpr IntRange(int from, int to) noexcept
+      :from{from}, to{to} { }
+
+  [[nodiscard]] constexpr IntRangeIterator iterator() const noexcept
+  {
+    return IntRangeIterator{from, to};
+  }
+};
+```
+
 ## Compiler Support
 
 As of this writing GCC 10 or Clang 10 are required.

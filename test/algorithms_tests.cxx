@@ -12,16 +12,18 @@ class IntRangeIterator final {
   int last;
 
 public:
-  constexpr IntRangeIterator(int current, int last) noexcept
-      :current{current}, last{last} { }
+  constexpr IntRangeIterator(int start, int last) noexcept
+      :current{start}, last{last} { }
 
   [[nodiscard]] constexpr bool has_next() const noexcept
   {
     return current<=last;
   }
 
-  constexpr int next() noexcept
+  constexpr int next()
   {
+    if (!has_next())
+      throw si::no_such_element_exception{"Called next() on empty iterator."};
     return current++;
   }
 };
