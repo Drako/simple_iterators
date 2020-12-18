@@ -151,3 +151,16 @@ TEST(AlgorithmsTests, TakeAndDrop)
 
   EXPECT_EQ(results, expected);
 }
+
+TEST(AlgorithmsTests, Count)
+{
+  auto const range = IntRange{1, 5};
+  EXPECT_EQ(range << si::count<int>(), 5);
+}
+
+TEST(AlgorithmsTests, CountWithPredicate)
+{
+  auto const range = IntRange{1, 20};
+  auto const count = range << si::count<int>([](int n) { return n%2==0; });
+  EXPECT_EQ(count, 10);
+}

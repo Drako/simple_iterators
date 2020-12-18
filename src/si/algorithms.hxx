@@ -183,6 +183,39 @@ namespace si {
     {
       return DroppingTaking<T, decltype(i.iterator())>{i.iterator(), dt};
     }
+
+    template<typename T>
+    struct JustCount {
+    };
+
+    template<typename T, Iterable<T> I>
+    inline std::size_t operator<<(I&& i, JustCount<T>)
+    {
+      auto it = i.iterator();
+      std::size_t result = 0u;
+      while (it.has_next()) {
+        (void) it.next();
+        ++result;
+      }
+      return result;
+    }
+
+    template<typename T, Predicate<T> P>
+    struct CountFiltered {
+      P predicate;
+    };
+
+    template<typename T, Iterable<T> I, Predicate<T> P>
+    inline std::size_t operator<<(I&& i, CountFiltered<T, P>&& cf)
+    {
+      auto it = i.iterator();
+      std::size_t result = 0u;
+      while (it.has_next()) {
+        if (cf.predicate(it.next()))
+          ++result;
+      }
+      return result;
+    }
   }
 
   template<typename T, Consumer<T> C>
@@ -226,6 +259,18 @@ namespace si {
   inline auto take(unsigned n)
   {
     return detail::DropTake<T>{0u, n};
+  }
+
+  template<typename T>
+  inline auto count()
+  {
+    return detail::JustCount<T>{};
+  }
+
+  template<typename T, Predicate<T> P>
+  inline auto count(P&& p)
+  {
+    return detail::CountFiltered<T, P>{p};
   }
 }
 
