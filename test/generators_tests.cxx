@@ -20,18 +20,21 @@ TEST(GeneratorsTests, GenerateInfinite)
   EXPECT_EQ(greaterThanTwenty, 12);
 }
 
+auto int_range(int from, int to)
+{
+  return si::generate<int>([=]() mutable -> std::optional<int> {
+    if (from>to) return {};
+    return from++;
+  });
+}
+
 TEST(GeneratorsTests, GenerateFinite)
 {
-  auto range = si::generate<int>([n = 0]() mutable -> std::optional<int> {
-    if (n==10) return {};
-    return n++;
-  });
-
   std::vector const expected{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
   std::vector<int> results;
   results.reserve(10u);
 
-  range
+  int_range(0, 9)
       << si::for_each<int>([&results](int n) { results.push_back(n); });
 
   EXPECT_EQ(results, expected);
