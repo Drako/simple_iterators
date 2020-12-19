@@ -164,3 +164,31 @@ TEST(AlgorithmsTests, CountWithPredicate)
   auto const count = range << si::count<int>([](int n) { return n%2==0; });
   EXPECT_EQ(count, 10);
 }
+
+TEST(AlgorithmsTests, ZipWithNext)
+{
+  std::vector<std::pair<int, int>> const expected{{1, 2},
+                                                  {2, 3},
+                                                  {3, 4}};
+  std::vector<std::pair<int, int>> results;
+  results.reserve(3u);
+
+  IntRange{1, 4}
+      << si::zip_with_next<int>()
+      << si::for_each<std::pair<int, int>>([&results](std::pair<int, int> p) { results.push_back(p); });
+
+  EXPECT_EQ(results, expected);
+}
+
+TEST(AlgorithmsTests, ZipWithNextEmpty)
+{
+  std::vector<std::pair<int, int>> const expected{};
+  std::vector<std::pair<int, int>> results;
+
+  IntRange{1, 1}
+      << si::zip_with_next<int>()
+      << si::for_each<std::pair<int, int>>([&results](std::pair<int, int> p) { results.push_back(p); });
+
+  EXPECT_EQ(results, expected);
+}
+

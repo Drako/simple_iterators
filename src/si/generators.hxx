@@ -46,7 +46,7 @@ namespace si {
     struct Generating final {
       G generator;
 
-      auto iterator()
+      auto iterator() const
       {
         return GeneratingIterator<T, G>{generator};
       }
