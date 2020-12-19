@@ -41,7 +41,10 @@ namespace si {
       I base;
       M mapper;
 
-      [[nodiscard]] inline bool has_next() const { return base.has_next(); }
+      [[nodiscard]] inline bool has_next()
+      {
+        return base.has_next();
+      }
 
       inline Target next()
       {
@@ -163,7 +166,7 @@ namespace si {
         skip();
       }
 
-      [[nodiscard]] inline bool has_next() const
+      [[nodiscard]] inline bool has_next()
       {
         return current<dt.take && base.has_next();
       }
@@ -278,6 +281,30 @@ namespace si {
     {
       return ZippingWithNext<T, decltype(i.iterator())>{i.iterator()};
     }
+
+    template<typename Source, typename Target, Aggregator<Source, Source, Target> A>
+    struct ZipWithNextMap final {
+      A aggregator;
+    };
+
+    template<typename Source, typename Target, Iterable<Source> I, Aggregator<Source, Source, Target> A>
+    inline auto operator<<(I const& i, ZipWithNextMap<Source, Target, A> const& a)
+    {
+      auto const mapper = [a](std::pair<Source, Source> p) { return a.aggregator(p.first, p.second); };
+      return i << ZipWithNext<Source>{} << Map<std::pair<Source, Source>, Target, decltype(mapper)>{mapper};
+    }
+
+    template<typename T>
+    struct Indexed final {
+    };
+
+    template<typename T, Iterable<T> I>
+    inline auto operator<<(I const& i, Indexed<T>)
+    {
+      std::size_t idx = 0u;
+      auto indexer = [idx](T const& item) mutable { return std::pair{idx++, item}; };
+      return i << Map<T, std::pair<std::size_t, T>, decltype(indexer)>{indexer};
+    }
   }
 
   template<typename T, Consumer<T> C>
@@ -339,6 +366,18 @@ namespace si {
   inline auto zip_with_next()
   {
     return detail::ZipWithNext<T>{};
+  }
+
+  template<typename Source, typename Target, Aggregator<Source, Source, Target> A>
+  inline auto zip_with_next(A const& agg)
+  {
+    return detail::ZipWithNextMap<Source, Target, A>{agg};
+  }
+
+  template<typename T>
+  inline auto indexed()
+  {
+    return detail::Indexed<T>{};
   }
 }
 

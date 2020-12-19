@@ -180,7 +180,7 @@ TEST(AlgorithmsTests, ZipWithNext)
   EXPECT_EQ(results, expected);
 }
 
-TEST(AlgorithmsTests, ZipWithNextEmpty)
+TEST(AlgorithmsTests, ZipWithNextOne)
 {
   std::vector<std::pair<int, int>> const expected{};
   std::vector<std::pair<int, int>> results;
@@ -192,3 +192,47 @@ TEST(AlgorithmsTests, ZipWithNextEmpty)
   EXPECT_EQ(results, expected);
 }
 
+TEST(AlgorithmsTests, ZipWithNextEmpty)
+{
+  std::vector<std::pair<int, int>> const expected{};
+  std::vector<std::pair<int, int>> results;
+
+  IntRange{1, 0}
+      << si::zip_with_next<int>()
+      << si::for_each<std::pair<int, int>>([&results](std::pair<int, int> p) { results.push_back(p); });
+
+  EXPECT_EQ(results, expected);
+}
+
+TEST(AlgorithmsTests, ZipWithNextMap)
+{
+  std::vector const expected{3, 5, 7};
+  std::vector<int> results;
+
+  IntRange{1, 4}
+      << si::zip_with_next<int, int>([](int a, int b) { return a+b; })
+      << si::for_each<int>([&results](int n) { results.push_back(n); });
+
+  EXPECT_EQ(results, expected);
+}
+
+TEST(AlgorithmsTests, Indexed)
+{
+  std::vector<std::pair<std::size_t, int>> const expected{{0u, 10},
+                                                          {1u, 12},
+                                                          {2u, 14}};
+  std::vector<std::pair<std::size_t, int>> results;
+  results.reserve(3u);
+
+  IntRange{5, 20}
+      << si::filter<int>([](int n) { return n%2==0; })
+      << si::drop<int>(2u)
+      << si::take<int>(3u)
+      << si::indexed<int>()
+      << si::for_each<std::pair<std::size_t, int>>([&results](std::pair<std::size_t, int> p) {
+        auto const[idx, n] = p;
+        results.emplace_back(idx, n);
+      });
+
+  EXPECT_EQ(results, expected);
+}
