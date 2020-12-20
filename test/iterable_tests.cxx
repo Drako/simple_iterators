@@ -3,7 +3,10 @@
 #include <si/si.hxx>
 
 #include <array>
+#include <cctype>
+#include <functional>
 #include <list>
+#include <string>
 #include <vector>
 
 // test structures to see whether the concept is working as intended
@@ -85,10 +88,25 @@ TEST(IterableTests, LegacyWrapperPointers)
   std::list const expected{"alpha", "bravo", "charlie"};
   std::list<char const*> results;
 
-  si::iterate(argv+0, argv+3)
+  si::iterate(+argv, argv+3)
       << si::for_each<char const*>([&results](char const* arg) {
         results.push_back(arg);
       });
 
   EXPECT_EQ(results, expected);
+}
+
+TEST(IterableTests, LegacyWrapperString)
+{
+  using namespace std::placeholders;
+
+  std::string const source{"hello world!"};
+  std::string const expected{"HELLO WORLD!"};
+  std::string result;
+
+  si::iterate(source)
+      << si::map<char, char>([](char c) -> char { return std::toupper(c); })
+      << si::for_each<char>(std::bind<>(&std::string::push_back, &result, _1));
+
+  EXPECT_EQ(result, expected);
 }
