@@ -33,11 +33,10 @@ static_assert(!si::Iterator<IntIterator, float>, "IntIterator should not be an s
 
 TEST(IteratorTests, StringFromIteratorWrapper)
 {
-  using namespace std::literals::string_literals;
-
+  std::string const source{"hello world!"};
   std::string const expected{"HELLO WORLD!"};
 
-  auto mapping = si::iterate("hello world!"s)
+  auto mapping = si::iterate(source)
       << si::map<char, char>([](char c) -> char { return std::toupper(c); });
 
   si::IteratorWrapper<char, decltype(mapping.iterator())> begin{mapping.iterator()};
