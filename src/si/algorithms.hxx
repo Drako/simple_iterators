@@ -13,15 +13,6 @@
 
 namespace si {
   namespace detail {
-    template<typename T, Iterator<T> I>
-    inline std::optional<T> maybe_next(I& i)
-    {
-      if (i.has_next())
-        return i.next();
-      else
-        return {};
-    }
-
     template<typename T, Consumer<T> C>
     struct ForEach final {
       C consumer;

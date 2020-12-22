@@ -106,7 +106,8 @@ TEST(IterableTests, LegacyWrapperString)
 
   si::iterate(source)
       << si::map<char, char>([](char c) -> char { return std::toupper(c); })
-      << si::for_each<char>(std::bind<>(&std::string::push_back, &result, _1));
+      // just to test if it would work... don't actually use std::bind
+      << si::for_each<char>(std::bind(&std::string::push_back, &result, _1));
 
   EXPECT_EQ(result, expected);
 }
