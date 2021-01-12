@@ -6,6 +6,8 @@
 #include <cctype>
 #include <functional>
 #include <list>
+#include <unordered_map>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -108,6 +110,25 @@ TEST(IterableTests, LegacyWrapperString)
       << si::map<char, char>([](char c) -> char { return std::toupper(c); })
       // just to test if it would work... don't actually use std::bind
       << si::for_each<char>(std::bind(&std::string::push_back, &result, _1));
+
+  EXPECT_EQ(result, expected);
+}
+
+TEST(IterableTests, LegacyWrapperUnorderedMap)
+{
+  std::unordered_map<std::string, int> const source{
+      {"answer",     42},
+      {"illuminati", 23},
+      {"leet",       1337},
+  };
+  using kv = decltype(source)::value_type;
+
+  std::set const expected{42, 23, 1337};
+  std::set<int> result;
+
+  si::iterate(source)
+      << si::map<kv, int>([](kv const& p) -> int { return p.second; })
+      << si::for_each<int>([&result](int n) { result.insert(n); });
 
   EXPECT_EQ(result, expected);
 }
