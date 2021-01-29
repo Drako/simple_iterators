@@ -13,7 +13,7 @@ function codecov {
     local source="$folder/$filename"
     local notes="$BUILD_DIR/$folder/CMakeFiles/$target.dir/$filename.gcno"
     #echo "$source -> $notes"
-    gcov-10 -n -o "$notes" "$source" > /dev/null
+    gcov-10 -o "$notes" "$source" > /dev/null
   done
 }
 
