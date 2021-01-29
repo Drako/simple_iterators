@@ -15,7 +15,7 @@ jobs:
           submodules: true
 
       - name: Install GCC-10
-        run: sudo apt install gcc-10
+        run: sudo apt install gcc-10 g++-10 gcov-10
 
       - name: Create Build Environment
         run: cmake -E make_directory ${{runner.workspace}}/build
@@ -26,7 +26,7 @@ jobs:
         env:
           CXX: /usr/bin/g++-10
           CC: /usr/bin/gcc-10
-        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS=--coverage -DCMAKE_C_FLAGS=--coverage
 
       - name: Build
         working-directory: ${{runner.workspace}}/build
@@ -37,3 +37,12 @@ jobs:
         working-directory: ${{runner.workspace}}/build
         shell: bash
         run: ctest -C $BUILD_TYPE -V
+
+      - name: Coverage
+        working-directory: ${{runner.workspace}}
+        shell: bash
+        env:
+          CODECOV_TOKEN: d51f48e8-a468-491a-8fd8-c4c805200be1
+        run: |
+          bash codecov.sh
+          bash <(curl -s https://codecov.io/bash)
