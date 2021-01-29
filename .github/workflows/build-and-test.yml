@@ -42,12 +42,10 @@ jobs:
         run: ctest -C $BUILD_TYPE -V
 
       - name: Coverage
-        working-directory: ${{runner.workspace}}
+        working-directory: ${{runner.workspace}}/simple_iterators
         shell: bash
         env:
           CODECOV_TOKEN: d51f48e8-a468-491a-8fd8-c4c805200be1
         run: |
-          pwd
-          ls
           bash ./codecov.sh
           bash <(curl -s https://codecov.io/bash)
