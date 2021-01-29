@@ -39,3 +39,11 @@ TEST(GeneratorsTests, GenerateFinite)
 
   EXPECT_EQ(results, expected);
 }
+
+TEST(GeneratorsTests, TryToGetMoreValuesThanGenerated) {
+  auto gen = int_range(0, 1);
+  auto it = gen.iterator();
+  EXPECT_EQ(it.next(), 0);
+  EXPECT_EQ(it.next(), 1);
+  EXPECT_THROW(it.next(), si::no_such_element_exception);
+}

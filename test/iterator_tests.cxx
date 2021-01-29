@@ -73,3 +73,33 @@ TEST(IteratorTests, VectorFromIteratorWrapper)
 
   EXPECT_EQ(result, expected);
 }
+
+struct Dummy {
+  int value;
+};
+
+struct DummyIterator {
+  constexpr bool has_next() const
+  {
+    return true;
+  }
+
+  constexpr Dummy next()
+  {
+    return {42};
+  }
+};
+
+TEST(IteratorTests, TryReadingFromEndIterator)
+{
+  si::IteratorWrapper<Dummy, DummyIterator> end{};
+  EXPECT_THROW(*end, si::no_such_element_exception);
+  EXPECT_THROW(end->value, si::no_such_element_exception);
+}
+
+TEST(IteratorTests, DereferenceStructure) {
+  DummyIterator it;
+  si::IteratorWrapper<Dummy, DummyIterator> iw{it};
+  EXPECT_EQ((*iw).value, 42);
+  EXPECT_EQ(iw->value, 42);
+}

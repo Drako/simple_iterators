@@ -132,3 +132,10 @@ TEST(IterableTests, LegacyWrapperUnorderedMap)
 
   EXPECT_EQ(result, expected);
 }
+
+TEST(IterableTests, LegacyWrapperReadAfterEnd) {
+  std::vector<int> const empty;
+  auto const iterable = si::iterate(empty);
+  auto it = iterable.iterator();
+  EXPECT_THROW(it.next(), si::no_such_element_exception);
+}

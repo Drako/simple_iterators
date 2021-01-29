@@ -42,6 +42,28 @@ public:
   }
 };
 
+TEST(AlgorithmsTests, TryReadingAfterEndOfIntRangeIterator) {
+  auto const range = IntRange{0, 1};
+  auto it = range.iterator();
+  EXPECT_EQ(it.next(), 0);
+  EXPECT_EQ(it.next(), 1);
+  EXPECT_THROW(it.next(), si::no_such_element_exception);
+}
+
+TEST(AlgorithmsTests, TryReadingAfterEndOfFilteringIterator) {
+  auto const range = IntRange{0, 1}
+    << si::filter<int>([](int n){ return n > 2; });
+  auto it = range.iterator();
+  EXPECT_THROW(it.next(), si::no_such_element_exception);
+}
+
+TEST(AlgorithmsTests, TryReadingAfterEndOfDroppingTakingIterator) {
+  auto const range = IntRange{0, 1}
+    << si::drop<int>(2u);
+  auto it = range.iterator();
+  EXPECT_THROW(it.next(), si::no_such_element_exception);
+}
+
 TEST(AlgorithmsTests, ForEach)
 {
   auto const range = IntRange{1, 10};
