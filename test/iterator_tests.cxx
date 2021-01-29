@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+#include "config.hxx"
+
 // test structures to see whether the concept is working as intended
 struct IntIterator {
   bool has_next() const;
@@ -90,6 +92,7 @@ struct DummyIterator {
   }
 };
 
+#ifndef SKIP_EXCEPTION_TESTS
 TEST(IteratorTests, TryReadingFromEndIterator)
 {
   si::IteratorWrapper<Dummy, DummyIterator> end{};
@@ -103,3 +106,4 @@ TEST(IteratorTests, DereferenceStructure) {
   EXPECT_EQ((*iw).value, 42);
   EXPECT_EQ(iw->value, 42);
 }
+#endif // SKIP_EXCEPTION_TESTS

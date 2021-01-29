@@ -4,6 +4,8 @@
 
 #include <vector>
 
+#include "config.hxx"
+
 TEST(GeneratorsTests, GenerateInfinite)
 {
   auto fib = si::generate<int>([a = 0, b = 1]() mutable -> std::optional<int> {
@@ -40,6 +42,7 @@ TEST(GeneratorsTests, GenerateFinite)
   EXPECT_EQ(results, expected);
 }
 
+#ifndef SKIP_EXCEPTION_TESTS
 TEST(GeneratorsTests, TryToGetMoreValuesThanGenerated) {
   auto gen = int_range(0, 1);
   auto it = gen.iterator();
@@ -47,3 +50,4 @@ TEST(GeneratorsTests, TryToGetMoreValuesThanGenerated) {
   EXPECT_EQ(it.next(), 1);
   EXPECT_THROW(it.next(), si::no_such_element_exception);
 }
+#endif // SKIP_EXCEPTION_TESTS

@@ -11,6 +11,8 @@
 #include <string>
 #include <vector>
 
+#include "config.hxx"
+
 // test structures to see whether the concept is working as intended
 struct IntIterator {
   bool has_next() const;
@@ -133,9 +135,11 @@ TEST(IterableTests, LegacyWrapperUnorderedMap)
   EXPECT_EQ(result, expected);
 }
 
+#ifndef SKIP_EXCEPTION_TESTS
 TEST(IterableTests, LegacyWrapperReadAfterEnd) {
   std::vector<int> const empty;
   auto const iterable = si::iterate(empty);
   auto it = iterable.iterator();
   EXPECT_THROW(it.next(), si::no_such_element_exception);
 }
+#endif // SKIP_EXCEPTION_TESTS

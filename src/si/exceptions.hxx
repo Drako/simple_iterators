@@ -7,11 +7,11 @@
 
 namespace si {
   struct exception : std::runtime_error {
-    explicit exception(std::string const& message);
+    explicit exception(char const* message);
   };
 
   struct no_such_element_exception : exception {
-    explicit no_such_element_exception(std::string const& message);
+    explicit no_such_element_exception(char const* message);
   };
 }
 

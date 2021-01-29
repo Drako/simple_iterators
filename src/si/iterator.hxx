@@ -28,7 +28,7 @@ namespace si {
   template<typename T, Iterator<T> I>
   class IteratorWrapper final {
     mutable std::optional<I> base;
-    std::optional<T> value;
+    std::optional<T> value{};
 
   public:
     using iterator_category = std::input_iterator_tag;

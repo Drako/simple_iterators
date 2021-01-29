@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "config.hxx"
+
 using namespace std::literals::string_literals;
 
 class IntRangeIterator final {
@@ -42,6 +44,7 @@ public:
   }
 };
 
+#ifndef SKIP_EXCEPTION_TESTS
 TEST(AlgorithmsTests, TryReadingAfterEndOfIntRangeIterator) {
   auto const range = IntRange{0, 1};
   auto it = range.iterator();
@@ -63,6 +66,7 @@ TEST(AlgorithmsTests, TryReadingAfterEndOfDroppingTakingIterator) {
   auto it = range.iterator();
   EXPECT_THROW(it.next(), si::no_such_element_exception);
 }
+#endif // SKIP_EXCEPTION_TESTS
 
 TEST(AlgorithmsTests, ForEach)
 {
