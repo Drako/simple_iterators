@@ -87,6 +87,13 @@ namespace si {
       }
       return *this;
     }
+
+    inline IteratorWrapper operator++(int)
+    {
+      IteratorWrapper const old{*this};
+      ++(*this);
+      return old;
+    }
   };
 }
 

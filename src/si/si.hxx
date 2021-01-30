@@ -5,5 +5,6 @@
 
 #include "algorithms.hxx"
 #include "generators.hxx"
+#include "range.hxx"
 
 #endif // SI_SI_HXX

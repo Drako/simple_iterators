@@ -6,6 +6,16 @@
 
 #include "config.hxx"
 
+namespace {
+  auto int_range(int from, int to)
+  {
+    return si::generate<int>([=]() mutable -> std::optional<int> {
+      if (from>to) return {};
+      return from++;
+    });
+  }
+}
+
 TEST(GeneratorsTests, GenerateInfinite)
 {
   auto fib = si::generate<int>([a = 0, b = 1]() mutable -> std::optional<int> {
@@ -22,14 +32,6 @@ TEST(GeneratorsTests, GenerateInfinite)
   EXPECT_EQ(greaterThanTwenty, 12);
 }
 
-auto int_range(int from, int to)
-{
-  return si::generate<int>([=]() mutable -> std::optional<int> {
-    if (from>to) return {};
-    return from++;
-  });
-}
-
 TEST(GeneratorsTests, GenerateFinite)
 {
   std::vector const expected{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -43,11 +45,13 @@ TEST(GeneratorsTests, GenerateFinite)
 }
 
 #ifndef SKIP_EXCEPTION_TESTS
-TEST(GeneratorsTests, TryToGetMoreValuesThanGenerated) {
+TEST(GeneratorsTests, TryToGetMoreValuesThanGenerated)
+{
   auto gen = int_range(0, 1);
   auto it = gen.iterator();
   EXPECT_EQ(it.next(), 0);
   EXPECT_EQ(it.next(), 1);
   EXPECT_THROW(it.next(), si::no_such_element_exception);
 }
+
 #endif // SKIP_EXCEPTION_TESTS
