@@ -1,6 +1,7 @@
 # Simple Iterators
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Build status](https://github.com/Drako/simple_iterators/workflows/build-and-test/badge.svg)](https://github.com/Drako/simple_iterators/actions?query=workflow:build-and-test)
 [![Codecov status](https://codecov.io/gh/Drako/simple_iterators/branch/master/graph/badge.svg)](https://codecov.io/gh/Drako/simple_iterators/branch/master)
 
 This project aims at providing an iterator mechanism inspired by Java.
