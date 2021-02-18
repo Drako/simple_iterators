@@ -19,7 +19,7 @@ that are compatible with any types implementing these concepts.
 
 Add this library as a submodule and include it via `add_subdirectory()`
 into your CMake project.
-Then link everything you need is to link against the `si` target.
+Then everything you need to do, is to link against the `si` target.
 
 Example:
 ```shell
