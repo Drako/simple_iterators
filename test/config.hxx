@@ -22,7 +22,7 @@
 #endif // __APPLE__
 
 // might also be broken on other platforms, but currently I only encountered the issue on Mac OS X with GCC 10
-#ifdef APPLE_OSX
+#if defined(APPLE_OSX) && !defined(__clang__)
 #define SKIP_EXCEPTION_TESTS 1
 #endif // APPLE_OSX
 
