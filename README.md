@@ -10,7 +10,7 @@ The iterators of the C++ standard library are rather complex and rely heavily on
 This library uses C++ 20 concepts to make anything iterable that has an `iterator()` member function returning
 an iterator. An iterator is anything providing the member functions `has_next()` and `next()`.
 
-Next to the two concepts `Iterable<T>` and `Iterator<T>` this library provides a bunch of algorithms
+Next to the two concepts `Iterable` and `Iterator` this library provides a bunch of algorithms
 that are compatible with any types implementing these concepts.
 
 ## Usage

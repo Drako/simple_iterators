@@ -7,17 +7,18 @@
 #include <iterator>
 #include <optional>
 
+#include "callables.hxx"
 #include "exceptions.hxx"
 
 namespace si {
-  template<typename T, typename Value>
+  template<typename T>
   concept Iterator = requires(T iterator) {
     { iterator.has_next() } -> std::same_as<bool>;
-    { iterator.next() } -> std::same_as<Value>;
+    { iterator.next() } -> NotVoid;
   };
 
-  template<typename T, Iterator<T> I>
-  inline std::optional<T> maybe_next(I& i)
+  template<Iterator I>
+  inline auto maybe_next(I& i) -> std::optional<decltype(i.next())>
   {
     if (i.has_next())
       return i.next();
@@ -25,9 +26,11 @@ namespace si {
       return {};
   }
 
-  template<typename T, Iterator<T> I>
+  template<Iterator I>
   class IteratorWrapper final {
     mutable std::optional<I> base;
+
+    using T = decltype(std::declval<I>().next());
     std::optional<T> value{};
 
   public:
@@ -83,7 +86,7 @@ namespace si {
     inline IteratorWrapper& operator++()
     {
       if (base.has_value()) {
-        value = maybe_next<value_type>(base.value());
+        value = maybe_next(base.value());
       }
       return *this;
     }

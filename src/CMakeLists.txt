@@ -4,6 +4,8 @@ add_library(si STATIC
     si/iterable.hxx
     si/callables.hxx
     si/algorithms.hxx
+    si/algorithms/indexed.hxx
+    si/algorithms/map.hxx
     si/generators.hxx
     si/exceptions.hxx si/exceptions.cxx
     si/range.hxx

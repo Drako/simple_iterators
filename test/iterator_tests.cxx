@@ -27,11 +27,10 @@ struct MissingAll {
 };
 
 // the tests
-static_assert(si::Iterator<IntIterator, int>, "IntIterator should be an si::Iterator<int>");
-static_assert(!si::Iterator<MissingNext, int>, "MissingNext should not be an si::Iterator<?>");
-static_assert(!si::Iterator<MissingHasNext, int>, "MissingHasNext should not be an si::Iterator<?>");
-static_assert(!si::Iterator<MissingAll, int>, "MissingAll should not be an si::Iterator<?>");
-static_assert(!si::Iterator<IntIterator, float>, "IntIterator should not be an si::Iterator<float>");
+static_assert(si::Iterator<IntIterator>, "IntIterator should be an si::Iterator<?>");
+static_assert(!si::Iterator<MissingNext>, "MissingNext should not be an si::Iterator<?>");
+static_assert(!si::Iterator<MissingHasNext>, "MissingHasNext should not be an si::Iterator<?>");
+static_assert(!si::Iterator<MissingAll>, "MissingAll should not be an si::Iterator<?>");
 
 TEST(IteratorTests, StringFromIteratorWrapper)
 {
@@ -39,10 +38,10 @@ TEST(IteratorTests, StringFromIteratorWrapper)
   std::string const expected{"HELLO WORLD!"};
 
   auto mapping = si::iterate(source)
-      << si::map<char, char>([](char c) -> char { return std::toupper(c); });
+      << si::map([](char c) -> char { return std::toupper(c); });
 
-  si::IteratorWrapper<char, decltype(mapping.iterator())> begin{mapping.iterator()};
-  si::IteratorWrapper<char, decltype(mapping.iterator())> end{};
+  si::IteratorWrapper begin{mapping.iterator()};
+  si::IteratorWrapper<decltype(mapping.iterator())> end{};
 
   std::string const result{begin, end};
 
@@ -59,17 +58,17 @@ TEST(IteratorTests, VectorFromIteratorWrapper)
       "11"s, "Fizz"s, "13"s, "14"s, "FizzBuzz"s,
   };
 
-  auto fizzbuzz = si::generate<int>([n = 1]() mutable -> std::optional<int> { return n++; })
-      << si::take<int>(15u)
-      << si::map<int, std::string>([](int n) {
+  auto fizzbuzz = si::generate([n = 1]() mutable { return n++; })
+      << si::take(15u)
+      << si::map([](int n) {
         std::string result;
         result += (n%3==0) ? "Fizz" : "";
         result += (n%5==0) ? "Buzz" : "";
         return result.empty() ? std::to_string(n) : result;
       });
 
-  si::IteratorWrapper<std::string, decltype(fizzbuzz.iterator())> begin{fizzbuzz.iterator()};
-  si::IteratorWrapper<std::string, decltype(fizzbuzz.iterator())> end{};
+  si::IteratorWrapper begin{fizzbuzz.iterator()};
+  si::IteratorWrapper<decltype(fizzbuzz.iterator())> end{};
 
   std::vector<std::string> const result{begin, end};
 
@@ -95,15 +94,17 @@ struct DummyIterator {
 #ifndef SKIP_EXCEPTION_TESTS
 TEST(IteratorTests, TryReadingFromEndIterator)
 {
-  si::IteratorWrapper<Dummy, DummyIterator> end{};
+  si::IteratorWrapper<DummyIterator> end{};
   EXPECT_THROW(*end, si::no_such_element_exception);
   EXPECT_THROW(end->value, si::no_such_element_exception);
 }
 
-TEST(IteratorTests, DereferenceStructure) {
+TEST(IteratorTests, DereferenceStructure)
+{
   DummyIterator it;
-  si::IteratorWrapper<Dummy, DummyIterator> iw{it};
+  si::IteratorWrapper<DummyIterator> iw{it};
   EXPECT_EQ((*iw).value, 42);
   EXPECT_EQ(iw->value, 42);
 }
+
 #endif // SKIP_EXCEPTION_TESTS

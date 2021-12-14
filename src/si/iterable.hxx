@@ -10,9 +10,9 @@
 #include <type_traits>
 
 namespace si {
-  template<typename T, typename Value>
+  template<typename T>
   concept Iterable = requires(T iterable) {
-    { iterable.iterator() } -> si::Iterator<Value>;
+    { iterable.iterator() } -> si::Iterator;
   };
 
   template<typename T>

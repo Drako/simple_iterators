@@ -10,13 +10,25 @@
 #include "iterable.hxx"
 
 namespace si {
-  template<typename T, typename Value>
-  concept Generator = Producer<T, std::optional<Value>>;
+  template<typename T>
+  concept Generator = Producer<T>;
 
   namespace detail {
-    template<typename T, Generator<T> G>
+    template<typename T>
+    struct RemoveOptional {
+      using type = T;
+    };
+
+    template<typename T>
+    struct RemoveOptional<std::optional<T>> {
+      using type = T;
+    };
+
+    template<Generator G>
     class GeneratingIterator final {
       G generator;
+      using T = typename RemoveOptional<decltype(generator())>::type;
+
       std::optional<T> value;
 
     public:
@@ -42,21 +54,21 @@ namespace si {
       }
     };
 
-    template<typename T, Generator<T> G>
+    template<Generator G>
     struct Generating final {
       G generator;
 
       auto iterator() const
       {
-        return GeneratingIterator<T, G>{generator};
+        return GeneratingIterator<G>{generator};
       }
     };
   }
 
-  template<typename T, Generator<T> G>
+  template<Generator G>
   inline auto generate(G const& g)
   {
-    return detail::Generating<T, G>{g};
+    return detail::Generating<G>{g};
   }
 }
 

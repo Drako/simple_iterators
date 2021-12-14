@@ -7,19 +7,22 @@
 #include "exceptions.hxx"
 #include "iterable.hxx"
 
+#include "algorithms/map.hxx"
+#include "algorithms/indexed.hxx"
+
 #include <limits>
 #include <optional>
 #include <utility>
 
 namespace si {
   namespace detail {
-    template<typename T, Consumer<T> C>
+    template<Consumer C>
     struct ForEach final {
       C consumer;
     };
 
-    template<typename T, Iterable<T> I, Consumer<T> C>
-    inline void operator<<(I const& i, ForEach<T, C> const& f)
+    template<Iterable I, Consumer C>
+    inline void operator<<(I const& i, ForEach<C> const& f)
     {
       auto it = i.iterator();
       while (it.has_next()) {
@@ -27,47 +30,11 @@ namespace si {
       }
     }
 
-    template<typename Source, typename Target, Iterator<Source> I, Mapper<Source, Target> M>
-    struct MappingIterator final {
-      I base;
-      M mapper;
-
-      [[nodiscard]] inline bool has_next()
-      {
-        return base.has_next();
-      }
-
-      inline Target next()
-      {
-        return mapper(base.next());
-      }
-    };
-
-    template<typename Source, typename Target, Iterator<Source> I, Mapper<Source, Target> M>
-    struct Mapping final {
-      I base;
-      M mapper;
-
-      inline auto iterator() const
-      {
-        return MappingIterator<Source, Target, I, M>{base, mapper};
-      }
-    };
-
-    template<typename Source, typename Target, Mapper<Source, Target> M>
-    struct Map final {
-      M mapper;
-    };
-
-    template<typename Source, typename Target, Iterable<Source> I, Mapper<Source, Target> M>
-    inline auto operator<<(I const& i, Map<Source, Target, M> const& m)
-    {
-      return Mapping<Source, Target, decltype(i.iterator()), M>{i.iterator(), m.mapper};
-    }
-
-    template<typename T, Iterator<T> I, Predicate<T> P>
+    template<Iterator I, Predicate P>
     class FilteringIterator final {
       I base;
+      using T = decltype(base.next());
+
       P predicate;
 
       std::optional<T> next_cached;
@@ -108,39 +75,40 @@ namespace si {
       }
     };
 
-    template<typename T, Iterator<T> I, Predicate<T> P>
+    template<Iterator I, Predicate P>
     struct Filtering final {
       I base;
       P predicate;
 
       inline auto iterator() const
       {
-        return FilteringIterator<T, I, P>{base, predicate};
+        return FilteringIterator<I, P>{base, predicate};
       }
     };
 
-    template<typename T, Predicate<T> P>
+    template<Predicate P>
     struct Filter final {
       P predicate;
     };
 
-    template<typename T, Iterable<T> I, Predicate<T> P>
-    inline auto operator<<(I const& i, Filter<T, P> const& f)
+    template<Iterable I, Predicate P>
+    inline auto operator<<(I const& i, Filter<P> const& f)
     {
-      return Filtering<T, decltype(i.iterator()), P>{i.iterator(), f.predicate};
+      return Filtering<decltype(i.iterator()), P>{i.iterator(), f.predicate};
     }
 
-    template<typename T>
     struct DropTake final {
       unsigned drop;
       unsigned take;
     };
 
-    template<typename T, Iterator<T> I>
+    template<Iterator I>
     struct DroppingTakingIterator {
     private:
       I base;
-      DropTake<T> dt;
+      using T = decltype(base.next());
+
+      DropTake dt;
       unsigned current = 0u;
 
       inline void skip()
@@ -151,7 +119,7 @@ namespace si {
       }
 
     public:
-      inline DroppingTakingIterator(I const& base, DropTake<T> dt)
+      inline DroppingTakingIterator(I const& base, DropTake dt)
           :base{base}, dt{dt}
       {
         skip();
@@ -171,29 +139,30 @@ namespace si {
       }
     };
 
-    template<typename T, Iterator<T> I>
+    template<Iterator I>
     struct DroppingTaking final {
       I base;
-      DropTake<T> dt;
+      using T = decltype(base.next());
+
+      DropTake dt;
 
       inline auto iterator() const
       {
-        return DroppingTakingIterator<T, I>{base, dt};
+        return DroppingTakingIterator<I>{base, dt};
       }
     };
 
-    template<typename T, Iterable<T> I>
-    inline auto operator<<(I const& i, DropTake<T> dt)
+    template<Iterable I>
+    inline auto operator<<(I const& i, DropTake dt)
     {
-      return DroppingTaking<T, decltype(i.iterator())>{i.iterator(), dt};
+      return DroppingTaking<decltype(i.iterator())>{i.iterator(), dt};
     }
 
-    template<typename T>
     struct JustCount final {
     };
 
-    template<typename T, Iterable<T> I>
-    inline std::size_t operator<<(I const& i, JustCount<T>)
+    template<Iterable I>
+    inline std::size_t operator<<(I const& i, JustCount)
     {
       auto it = i.iterator();
       std::size_t result = 0u;
@@ -204,13 +173,13 @@ namespace si {
       return result;
     }
 
-    template<typename T, Predicate<T> P>
+    template<Predicate P>
     struct CountFiltered final {
       P predicate;
     };
 
-    template<typename T, Iterable<T> I, Predicate<T> P>
-    inline std::size_t operator<<(I const& i, CountFiltered<T, P> const& cf)
+    template<Iterable I, Predicate P>
+    inline std::size_t operator<<(I const& i, CountFiltered<P> const& cf)
     {
       auto it = i.iterator();
       std::size_t result = 0u;
@@ -221,13 +190,14 @@ namespace si {
       return result;
     }
 
-    template<typename T>
     struct ZipWithNext final {
     };
 
-    template<typename T, Iterator<T> I>
+    template<Iterator I>
     class ZippingWithNextIterator final {
       I base;
+      using T = decltype(base.next());
+
       std::optional<T> current;
       std::optional<T> following;
 
@@ -252,123 +222,91 @@ namespace si {
       {
         std::pair result{current.value(), following.value()};
         current = following;
-        following = maybe_next<T>(base);
+        following = maybe_next(base);
         return result;
       }
     };
 
-    template<typename T, Iterator<T> I>
+    template<Iterator I>
     struct ZippingWithNext final {
       I base;
 
       inline auto iterator() const
       {
-        return ZippingWithNextIterator<T, I>{base};
+        return ZippingWithNextIterator<I>{base};
       }
     };
 
-    template<typename T, Iterable<T> I>
-    inline auto operator<<(I const& i, ZipWithNext<T> const& f)
+    template<Iterable I>
+    inline auto operator<<(I const& i, ZipWithNext const& f)
     {
-      return ZippingWithNext<T, decltype(i.iterator())>{i.iterator()};
+      return ZippingWithNext<decltype(i.iterator())>{i.iterator()};
     }
 
-    template<typename Source, typename Target, Aggregator<Source, Source, Target> A>
+    template<Aggregator A>
     struct ZipWithNextMap final {
       A aggregator;
     };
 
-    template<typename Source, typename Target, Iterable<Source> I, Aggregator<Source, Source, Target> A>
-    inline auto operator<<(I const& i, ZipWithNextMap<Source, Target, A> const& a)
+    template<Iterable I, Aggregator A>
+    inline auto operator<<(I const& i, ZipWithNextMap<A> const& a)
     {
+      using Source = decltype(i.iterator().next());
+
       auto const mapper = [a](std::pair<Source, Source> p) { return a.aggregator(p.first, p.second); };
-      return i << ZipWithNext<Source>{} << Map<std::pair<Source, Source>, Target, decltype(mapper)>{mapper};
-    }
-
-    template<typename T>
-    struct Indexed final {
-    };
-
-    template<typename T, Iterable<T> I>
-    inline auto operator<<(I const& i, Indexed<T>)
-    {
-      std::size_t idx = 0u;
-      auto indexer = [idx](T const& item) mutable { return std::pair{idx++, item}; };
-      return i << Map<T, std::pair<std::size_t, T>, decltype(indexer)>{indexer};
+      return i << ZipWithNext{} << Map<decltype(mapper)>{mapper};
     }
   }
 
-  template<typename T, Consumer<T> C>
+  template<Consumer C>
   inline auto for_each(C const& c)
   {
-    return detail::ForEach<T, C>{c};
+    return detail::ForEach<C>{c};
   }
 
-  template<typename Source, typename Target, Mapper<Source, Target> M>
-  inline auto map(M const& m)
-  {
-    return detail::Map<Source, Target, M>{m};
-  }
-
-  template<typename Source, typename Target, Mapper<Source, Target> M>
-  inline auto transform(M const& m)
-  {
-    return detail::Map<Source, Target, M>{m};
-  }
-
-  template<typename T, Predicate<T> P>
+  template<Predicate P>
   inline auto filter(P const& p)
   {
-    return detail::Filter<T, P>{p};
+    return detail::Filter<P>{p};
   }
 
-  template<typename T, Predicate<T> P>
+  template<Predicate P>
   inline auto copy_if(P const& p)
   {
-    return detail::Filter<T, P>{p};
+    return detail::Filter<P>{p};
   }
 
-  template<typename T>
   inline auto drop(unsigned n)
   {
     // technically this is not a "drop n, take all" but a "drop n, take 4.x billion", but that should be sufficient
-    return detail::DropTake<T>{n, std::numeric_limits<unsigned>::max()};
+    return detail::DropTake{n, std::numeric_limits<unsigned>::max()};
   }
 
-  template<typename T>
   inline auto take(unsigned n)
   {
-    return detail::DropTake<T>{0u, n};
+    return detail::DropTake{0u, n};
   }
 
-  template<typename T>
   inline auto count()
   {
-    return detail::JustCount<T>{};
+    return detail::JustCount{};
   }
 
-  template<typename T, Predicate<T> P>
+  template<Predicate P>
   inline auto count(P const& p)
   {
-    return detail::CountFiltered<T, P>{p};
+    return detail::CountFiltered<P>{p};
   }
 
-  template<typename T>
   inline auto zip_with_next()
   {
-    return detail::ZipWithNext<T>{};
+    return detail::ZipWithNext{};
   }
 
-  template<typename Source, typename Target, Aggregator<Source, Source, Target> A>
+  template<Aggregator A>
   inline auto zip_with_next(A const& agg)
   {
-    return detail::ZipWithNextMap<Source, Target, A>{agg};
-  }
-
-  template<typename T>
-  inline auto indexed()
-  {
-    return detail::Indexed<T>{};
+    return detail::ZipWithNextMap<A>{agg};
   }
 }
 

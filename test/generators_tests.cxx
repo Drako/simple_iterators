@@ -9,7 +9,7 @@
 namespace {
   auto int_range(int from, int to)
   {
-    return si::generate<int>([=]() mutable -> std::optional<int> {
+    return si::generate([=]() mutable -> std::optional<int> {
       if (from>to) return {};
       return from++;
     });
@@ -18,7 +18,7 @@ namespace {
 
 TEST(GeneratorsTests, GenerateInfinite)
 {
-  auto fib = si::generate<int>([a = 0, b = 1]() mutable -> std::optional<int> {
+  auto fib = si::generate([a = 0, b = 1]() mutable {
     auto const result = a;
     a = b;
     b += result;
@@ -26,8 +26,8 @@ TEST(GeneratorsTests, GenerateInfinite)
   });
 
   auto const greaterThanTwenty = fib
-      << si::take<int>(20u)
-      << si::count<int>([](int n) { return n>20; });
+      << si::take(20u)
+      << si::count([](int n) { return n>20; });
 
   EXPECT_EQ(greaterThanTwenty, 12);
 }
@@ -39,7 +39,7 @@ TEST(GeneratorsTests, GenerateFinite)
   results.reserve(10u);
 
   int_range(0, 9)
-      << si::for_each<int>([&results](int n) { results.push_back(n); });
+      << si::for_each([&results](int n) { results.push_back(n); });
 
   EXPECT_EQ(results, expected);
 }

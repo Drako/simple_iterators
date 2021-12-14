@@ -28,9 +28,8 @@ struct MissingIterator {
 };
 
 // the tests
-static_assert(si::Iterable<IntIterable, int>, "IntIterable should be an si::Iterable<int>");
-static_assert(!si::Iterable<IntIterable, float>, "IntIterable should not be an si::Iterable<float>");
-static_assert(!si::Iterable<MissingIterator, int>, "MissingIterator should not be an si::Iterable<?>");
+static_assert(si::Iterable<IntIterable>, "IntIterable should be an si::Iterable<?>");
+static_assert(!si::Iterable<MissingIterator>, "MissingIterator should not be an si::Iterable<?>");
 
 TEST(IterableTests, LegacyWrapperVector)
 {
@@ -39,7 +38,7 @@ TEST(IterableTests, LegacyWrapperVector)
   results.reserve(3u);
 
   si::iterate(expected)
-      << si::for_each<int>([&results](int n) { results.push_back(n); });
+      << si::for_each([&results](int n) { results.push_back(n); });
 
   EXPECT_EQ(results, expected);
 }
@@ -50,7 +49,7 @@ TEST(IterableTests, LegacyWrapperList)
   std::list<int> results;
 
   si::iterate(expected)
-      << si::for_each<int>([&results](int n) { results.push_back(n); });
+      << si::for_each([&results](int n) { results.push_back(n); });
 
   EXPECT_EQ(results, expected);
 }
@@ -61,8 +60,8 @@ TEST(IterableTests, LegacyWrapperArray)
   std::array<int, 3u> results{};
 
   si::iterate(expected)
-      << si::indexed<int>()
-      << si::for_each<std::pair<std::size_t, int>>([&results](std::pair<std::size_t, int> p) {
+      << si::indexed()
+      << si::for_each([&results](std::pair<std::size_t, int> p) {
         auto const[idx, n] = p;
         results[idx] = n;
       });
@@ -77,8 +76,8 @@ TEST(IterableTests, LegacyWrapperRawArray)
   std::array<int, 3u> results{};
 
   si::iterate(source)
-      << si::indexed<int>()
-      << si::for_each<std::pair<std::size_t, int>>([&results](std::pair<std::size_t, int> p) {
+      << si::indexed()
+      << si::for_each([&results](std::pair<std::size_t, int> p) {
         auto const[idx, n] = p;
         results[idx] = n;
       });
@@ -93,7 +92,7 @@ TEST(IterableTests, LegacyWrapperPointers)
   std::list<char const*> results;
 
   si::iterate(+argv, argv+3)
-      << si::for_each<char const*>([&results](char const* arg) {
+      << si::for_each([&results](char const* arg) {
         results.push_back(arg);
       });
 
@@ -109,9 +108,9 @@ TEST(IterableTests, LegacyWrapperString)
   std::string result;
 
   si::iterate(source)
-      << si::map<char, char>([](char c) -> char { return std::toupper(c); })
+      << si::map([](char c) { return std::toupper(c); })
       // just to test if it would work... don't actually use std::bind
-      << si::for_each<char>(std::bind(&std::string::push_back, &result, _1));
+      << si::for_each([&result](char c) { result.push_back(c); });
 
   EXPECT_EQ(result, expected);
 }
@@ -129,17 +128,19 @@ TEST(IterableTests, LegacyWrapperUnorderedMap)
   std::set<int> result;
 
   si::iterate(source)
-      << si::map<kv, int>([](kv const& p) -> int { return p.second; })
-      << si::for_each<int>([&result](int n) { result.insert(n); });
+      << si::map([](kv const& p) { return p.second; })
+      << si::for_each([&result](int n) { result.insert(n); });
 
   EXPECT_EQ(result, expected);
 }
 
 #ifndef SKIP_EXCEPTION_TESTS
-TEST(IterableTests, LegacyWrapperReadAfterEnd) {
+TEST(IterableTests, LegacyWrapperReadAfterEnd)
+{
   std::vector<int> const empty;
   auto const iterable = si::iterate(empty);
   auto it = iterable.iterator();
   EXPECT_THROW(it.next(), si::no_such_element_exception);
 }
+
 #endif // SKIP_EXCEPTION_TESTS

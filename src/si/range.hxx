@@ -8,36 +8,34 @@
 
 namespace si {
   namespace detail {
-    template<typename T, Iterator <T> I>
+    template<Iterator I>
     struct Range {
       I iterator;
 
       inline auto begin() const
       {
-        return IteratorWrapper<T, I>{iterator};
+        return IteratorWrapper<I>{iterator};
       }
 
       inline auto end() const
       {
-        return IteratorWrapper<T, I>{};
+        return IteratorWrapper<I>{};
       }
     };
 
-    template<typename T>
     struct ToRange {
     };
 
-    template<typename T, Iterable <T> I>
-    inline auto operator<<(I const& i, ToRange<T>)
+    template<Iterable I>
+    inline auto operator<<(I const& i, ToRange)
     {
-      return Range<T, decltype(i.iterator())>{i.iterator()};
+      return Range<decltype(i.iterator())>{i.iterator()};
     }
   }
 
-  template<typename ValueType>
   inline auto to_range()
   {
-    return detail::ToRange<ValueType>{};
+    return detail::ToRange{};
   }
 }
 

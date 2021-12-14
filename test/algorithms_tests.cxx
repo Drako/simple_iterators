@@ -45,7 +45,8 @@ public:
 };
 
 #ifndef SKIP_EXCEPTION_TESTS
-TEST(AlgorithmsTests, TryReadingAfterEndOfIntRangeIterator) {
+TEST(AlgorithmsTests, TryReadingAfterEndOfIntRangeIterator)
+{
   auto const range = IntRange{0, 1};
   auto it = range.iterator();
   EXPECT_EQ(it.next(), 0);
@@ -53,19 +54,22 @@ TEST(AlgorithmsTests, TryReadingAfterEndOfIntRangeIterator) {
   EXPECT_THROW(it.next(), si::no_such_element_exception);
 }
 
-TEST(AlgorithmsTests, TryReadingAfterEndOfFilteringIterator) {
+TEST(AlgorithmsTests, TryReadingAfterEndOfFilteringIterator)
+{
   auto const range = IntRange{0, 1}
-    << si::filter<int>([](int n){ return n > 2; });
+      << si::filter([](int n) { return n>2; });
   auto it = range.iterator();
   EXPECT_THROW(it.next(), si::no_such_element_exception);
 }
 
-TEST(AlgorithmsTests, TryReadingAfterEndOfDroppingTakingIterator) {
+TEST(AlgorithmsTests, TryReadingAfterEndOfDroppingTakingIterator)
+{
   auto const range = IntRange{0, 1}
-    << si::drop<int>(2u);
+      << si::drop(2u);
   auto it = range.iterator();
   EXPECT_THROW(it.next(), si::no_such_element_exception);
 }
+
 #endif // SKIP_EXCEPTION_TESTS
 
 TEST(AlgorithmsTests, ForEach)
@@ -75,7 +79,7 @@ TEST(AlgorithmsTests, ForEach)
   std::vector<int> results(10u);
   std::vector expected{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
-  range << si::for_each<int>([&results](int n) {
+  range << si::for_each([&results](int n) {
     results[n-1] = n;
   });
 
@@ -91,9 +95,9 @@ TEST(AlgorithmsTests, Map)
   std::vector expected{"2"s, "4"s, "6"s, "8"s, "10"s};
 
   range
-      << si::map<int, int>([](int n) { return n*2; })
-      << si::map<int, std::string>([](int n) { return std::to_string(n); })
-      << si::for_each<std::string>([&results](std::string&& s) { results.push_back(s); });
+      << si::map([](int n) { return n*2; })
+      << si::map([](int n) { return std::to_string(n); })
+      << si::for_each([&results](std::string&& s) { results.push_back(s); });
 
   EXPECT_EQ(results, expected);
 }
@@ -107,9 +111,9 @@ TEST(AlgorithmsTests, Transform)
   std::vector expected{"3"s, "6"s, "9"s, "12"s, "15"s};
 
   range
-      << si::transform<int, int>([](int n) { return n*3; })
-      << si::map<int, std::string>([](int n) { return std::to_string(n); })
-      << si::for_each<std::string>([&results](std::string&& s) { results.push_back(s); });
+      << si::transform([](int n) { return n*3; })
+      << si::map([](int n) { return std::to_string(n); })
+      << si::for_each([&results](std::string&& s) { results.push_back(s); });
 
   EXPECT_EQ(results, expected);
 }
@@ -123,9 +127,9 @@ TEST(AlgorithmsTests, Filter)
   std::vector expected{6, 8, 10};
 
   range
-      << si::map<int, int>([](int n) { return n*2; })
-      << si::filter<int>([](int n) { return n>5; })
-      << si::for_each<int>([&results](int n) { results.push_back(n); });
+      << si::map([](int n) { return n*2; })
+      << si::filter([](int n) { return n>5; })
+      << si::for_each([&results](int n) { results.push_back(n); });
 
   EXPECT_EQ(results, expected);
 }
@@ -139,9 +143,9 @@ TEST(AlgorithmsTests, CopyIf)
   std::vector expected{2, 4};
 
   range
-      << si::map<int, int>([](int n) { return n*2; })
-      << si::copy_if<int>([](int n) { return n<5; })
-      << si::for_each<int>([&results](int n) { results.push_back(n); });
+      << si::map([](int n) { return n*2; })
+      << si::copy_if([](int n) { return n<5; })
+      << si::for_each([&results](int n) { results.push_back(n); });
 
   EXPECT_EQ(results, expected);
 }
@@ -155,9 +159,9 @@ TEST(AlgorithmsTests, DropAndTake)
   std::vector expected{6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
 
   range
-      << si::drop<int>(5u)
-      << si::take<int>(10u)
-      << si::for_each<int>([&results](int n) { results.push_back(n); });
+      << si::drop(5u)
+      << si::take(10u)
+      << si::for_each([&results](int n) { results.push_back(n); });
 
   EXPECT_EQ(results, expected);
 }
@@ -171,9 +175,9 @@ TEST(AlgorithmsTests, TakeAndDrop)
   std::vector expected{6, 7, 8, 9, 10};
 
   range
-      << si::take<int>(10u)
-      << si::drop<int>(5u)
-      << si::for_each<int>([&results](int n) { results.push_back(n); });
+      << si::take(10u)
+      << si::drop(5u)
+      << si::for_each([&results](int n) { results.push_back(n); });
 
   EXPECT_EQ(results, expected);
 }
@@ -181,13 +185,13 @@ TEST(AlgorithmsTests, TakeAndDrop)
 TEST(AlgorithmsTests, Count)
 {
   auto const range = IntRange{1, 5};
-  EXPECT_EQ(range << si::count<int>(), 5);
+  EXPECT_EQ(range << si::count(), 5);
 }
 
 TEST(AlgorithmsTests, CountWithPredicate)
 {
   auto const range = IntRange{1, 20};
-  auto const count = range << si::count<int>([](int n) { return n%2==0; });
+  auto const count = range << si::count([](int n) { return n%2==0; });
   EXPECT_EQ(count, 10);
 }
 
@@ -200,8 +204,8 @@ TEST(AlgorithmsTests, ZipWithNext)
   results.reserve(3u);
 
   IntRange{1, 4}
-      << si::zip_with_next<int>()
-      << si::for_each<std::pair<int, int>>([&results](std::pair<int, int> p) { results.push_back(p); });
+      << si::zip_with_next()
+      << si::for_each([&results](std::pair<int, int> p) { results.push_back(p); });
 
   EXPECT_EQ(results, expected);
 }
@@ -212,8 +216,8 @@ TEST(AlgorithmsTests, ZipWithNextOne)
   std::vector<std::pair<int, int>> results;
 
   IntRange{1, 1}
-      << si::zip_with_next<int>()
-      << si::for_each<std::pair<int, int>>([&results](std::pair<int, int> p) { results.push_back(p); });
+      << si::zip_with_next()
+      << si::for_each([&results](std::pair<int, int> p) { results.push_back(p); });
 
   EXPECT_EQ(results, expected);
 }
@@ -224,8 +228,8 @@ TEST(AlgorithmsTests, ZipWithNextEmpty)
   std::vector<std::pair<int, int>> results;
 
   IntRange{1, 0}
-      << si::zip_with_next<int>()
-      << si::for_each<std::pair<int, int>>([&results](std::pair<int, int> p) { results.push_back(p); });
+      << si::zip_with_next()
+      << si::for_each([&results](std::pair<int, int> p) { results.push_back(p); });
 
   EXPECT_EQ(results, expected);
 }
@@ -236,8 +240,8 @@ TEST(AlgorithmsTests, ZipWithNextMap)
   std::vector<int> results;
 
   IntRange{1, 4}
-      << si::zip_with_next<int, int>([](int a, int b) { return a+b; })
-      << si::for_each<int>([&results](int n) { results.push_back(n); });
+      << si::zip_with_next([](int a, int b) { return a+b; })
+      << si::for_each([&results](int n) { results.push_back(n); });
 
   EXPECT_EQ(results, expected);
 }
@@ -251,11 +255,11 @@ TEST(AlgorithmsTests, Indexed)
   results.reserve(3u);
 
   IntRange{5, 20}
-      << si::filter<int>([](int n) { return n%2==0; })
-      << si::drop<int>(2u)
-      << si::take<int>(3u)
-      << si::indexed<int>()
-      << si::for_each<std::pair<std::size_t, int>>([&results](std::pair<std::size_t, int> p) {
+      << si::filter([](int n) { return n%2==0; })
+      << si::drop(2u)
+      << si::take(3u)
+      << si::indexed()
+      << si::for_each([&results](std::pair<std::size_t, int> p) {
         auto const[idx, n] = p;
         results.emplace_back(idx, n);
       });
