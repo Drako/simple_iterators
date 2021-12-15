@@ -6,6 +6,8 @@
 #include "../iterable.hxx"
 #include "./map.hxx"
 
+#include <utility>
+
 namespace si {
   namespace detail {
     struct Indexed final {

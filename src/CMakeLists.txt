@@ -4,8 +4,13 @@ add_library(si STATIC
     si/iterable.hxx
     si/callables.hxx
     si/algorithms.hxx
+    si/algorithms/count.hxx
+    si/algorithms/drop_take.hxx
+    si/algorithms/filter.hxx
+    si/algorithms/for_each.hxx
     si/algorithms/indexed.hxx
     si/algorithms/map.hxx
+    si/algorithms/zip.hxx
     si/generators.hxx
     si/exceptions.hxx si/exceptions.cxx
     si/range.hxx
