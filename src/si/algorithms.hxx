@@ -3,10 +3,6 @@
 #ifndef SI_ALGORITHMS_HXX
 #define SI_ALGORITHMS_HXX
 
-#include "callables.hxx"
-#include "exceptions.hxx"
-#include "iterable.hxx"
-
 #include "algorithms/count.hxx"
 #include "algorithms/drop_take.hxx"
 #include "algorithms/filter.hxx"

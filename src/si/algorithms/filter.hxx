@@ -3,6 +3,7 @@
 #ifndef SI_ALGORITHMS_FILTER_HXX
 #define SI_ALGORITHMS_FILTER_HXX
 
+#include "../exceptions.hxx"
 #include "../iterable.hxx"
 
 #include <optional>
