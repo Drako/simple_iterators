@@ -4,6 +4,7 @@ add_library(si STATIC
     si/iterable.hxx
     si/callables.hxx
     si/algorithms.hxx
+    si/algorithms/collect.hxx
     si/algorithms/count.hxx
     si/algorithms/drop_take.hxx
     si/algorithms/filter.hxx

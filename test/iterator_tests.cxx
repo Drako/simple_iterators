@@ -85,7 +85,7 @@ struct DummyIterator {
     return true;
   }
 
-  constexpr Dummy next()
+  constexpr Dummy next() const
   {
     return {42};
   }
@@ -102,7 +102,7 @@ TEST(IteratorTests, TryReadingFromEndIterator)
 TEST(IteratorTests, DereferenceStructure)
 {
   DummyIterator it;
-  si::IteratorWrapper<DummyIterator> iw{it};
+  si::IteratorWrapper iw{it};
   EXPECT_EQ((*iw).value, 42);
   EXPECT_EQ(iw->value, 42);
 }
