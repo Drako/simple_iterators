@@ -27,6 +27,14 @@ namespace si {
     };
 
     template<typename Return, typename... Args>
+    struct CallableTraits<Return(Args...)> {
+      using return_type = Return;
+      static constexpr auto argument_count = sizeof...(Args);
+      template<std::size_t N>
+      using argument_type = nth_t<N, Args...>;
+    };
+
+    template<typename Return, typename... Args>
     struct CallableTraits<Return(*)(Args...)> {
       using return_type = Return;
       static constexpr auto argument_count = sizeof...(Args);
@@ -69,6 +77,9 @@ namespace si {
   concept ReturnsValueOf = std::is_same_v<typename detail::CallableTraits<T>::return_type, Value>;
 
   template<typename T>
+  concept TakesNoArgument = detail::CallableTraits<T>::argument_count==0;
+
+  template<typename T>
   concept TakesSingleArgument = detail::CallableTraits<T>::argument_count==1;
 
   template<typename T>
@@ -84,13 +95,22 @@ namespace si {
   concept Consumer = TakesSingleArgument<T>;
 
   template<typename T>
-  concept Producer = ReturnsValue<T>;
+  concept BinaryConsumer = TakesTwoArguments<T>;
+
+  template<typename T>
+  concept Producer = TakesNoArgument<T> && ReturnsValue<T>;
 
   template<typename T>
   concept Predicate = TakesSingleArgument<T> && ReturnsValueOf<T, bool>;
 
   template<typename T>
+  concept BinaryPredicate = TakesTwoArguments<T> && ReturnsValueOf<T, bool>;
+
+  template<typename T>
   concept Mapper = TakesSingleArgument<T> && ReturnsValue<T>;
+
+  template<typename T>
+  concept BinaryMapper = TakesTwoArguments<T> && ReturnsValue<T>;
 
   template<typename T>
   concept Aggregator = TakesTwoArguments<T> && ReturnsFirstArgumentType<T>;

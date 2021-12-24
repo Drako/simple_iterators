@@ -53,10 +53,18 @@ namespace si {
     return detail::Map<M>{m};
   }
 
-  template<Mapper M>
-  inline auto transform(M const& m)
+  template<BinaryMapper BM>
+  inline auto map(BM const& bm)
   {
-    return detail::Map<M>{m};
+    using first = typename detail::CallableTraits<BM>::template argument_type<0u>;
+    using second = typename detail::CallableTraits<BM>::template argument_type<1u>;
+    return map([bm](std::pair<first, second> const& p) { return bm(p.first, p.second); });
+  }
+
+  template<typename Class, typename Member>
+  inline auto map_field(Member Class::* p)
+  {
+    return map([p](Class const& instance) { return instance.*p; });
   }
 }
 

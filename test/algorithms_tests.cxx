@@ -102,22 +102,6 @@ TEST(AlgorithmsTests, Map)
   EXPECT_EQ(results, expected);
 }
 
-TEST(AlgorithmsTests, Transform)
-{
-  auto const range = IntRange{1, 5};
-
-  std::vector<std::string> results;
-  results.reserve(5u);
-  std::vector expected{"3"s, "6"s, "9"s, "12"s, "15"s};
-
-  range
-      << si::transform([](int n) { return n*3; })
-      << si::map([](int n) { return std::to_string(n); })
-      << si::for_each([&results](std::string&& s) { results.push_back(s); });
-
-  EXPECT_EQ(results, expected);
-}
-
 TEST(AlgorithmsTests, Filter)
 {
   auto const range = IntRange{1, 5};
@@ -134,20 +118,17 @@ TEST(AlgorithmsTests, Filter)
   EXPECT_EQ(results, expected);
 }
 
-TEST(AlgorithmsTests, CopyIf)
+TEST(AlgorithmsTests, BinaryFilter)
 {
-  auto const range = IntRange{1, 5};
+  std::vector<int> const numbers{23, 42, 1337};
+  std::vector<std::size_t> const expected{0u, 2u};
+  std::vector<std::size_t> const indexes_of_odd_numbers = si::iterate(numbers)
+      << si::indexed()
+      << si::filter([](std::size_t, int const n) { return (n & 1)==1; })
+      << si::map_field(&std::pair<std::size_t, int>::first)
+      << si::collect();
 
-  std::vector<int> results;
-  results.reserve(2u);
-  std::vector expected{2, 4};
-
-  range
-      << si::map([](int n) { return n*2; })
-      << si::copy_if([](int n) { return n<5; })
-      << si::for_each([&results](int n) { results.push_back(n); });
-
-  EXPECT_EQ(results, expected);
+  EXPECT_EQ(indexes_of_odd_numbers, expected);
 }
 
 TEST(AlgorithmsTests, DropAndTake)
@@ -200,12 +181,9 @@ TEST(AlgorithmsTests, ZipWithNext)
   std::vector<std::pair<int, int>> const expected{{1, 2},
                                                   {2, 3},
                                                   {3, 4}};
-  std::vector<std::pair<int, int>> results;
-  results.reserve(3u);
-
-  IntRange{1, 4}
+  std::vector<std::pair<int, int>> const results = IntRange{1, 4}
       << si::zip_with_next()
-      << si::for_each([&results](std::pair<int, int> p) { results.push_back(p); });
+      << si::collect();
 
   EXPECT_EQ(results, expected);
 }

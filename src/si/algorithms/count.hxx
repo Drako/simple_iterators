@@ -52,6 +52,14 @@ namespace si {
   {
     return detail::CountFiltered<P>{p};
   }
+
+  template<BinaryPredicate BP>
+  inline auto count(BP const& bp)
+  {
+    using first = typename detail::CallableTraits<BP>::template argument_type<0u>;
+    using second = typename detail::CallableTraits<BP>::template argument_type<1u>;
+    return count([bp](std::pair<first, second> const& p) { return bp(p.first, p.second); });
+  }
 }
 
 #endif // SI_ALGORITHMS_COUNT_HXX

@@ -37,13 +37,9 @@ TEST(IteratorTests, StringFromIteratorWrapper)
   std::string const source{"hello world!"};
   std::string const expected{"HELLO WORLD!"};
 
-  auto mapping = si::iterate(source)
-      << si::map([](char c) -> char { return std::toupper(c); });
-
-  si::IteratorWrapper begin{mapping.iterator()};
-  si::IteratorWrapper<decltype(mapping.iterator())> end{};
-
-  std::string const result{begin, end};
+  auto const result = si::iterate(source)
+      << si::map([](char c) { return std::toupper(c); })
+      << si::collect<std::string>();
 
   EXPECT_EQ(result, expected);
 }
@@ -58,19 +54,15 @@ TEST(IteratorTests, VectorFromIteratorWrapper)
       "11"s, "Fizz"s, "13"s, "14"s, "FizzBuzz"s,
   };
 
-  auto fizzbuzz = si::generate([n = 1]() mutable { return n++; })
+  auto const result = si::generate([n = 1]() mutable { return n++; })
       << si::take(15u)
       << si::map([](int n) {
         std::string result;
         result += (n%3==0) ? "Fizz" : "";
         result += (n%5==0) ? "Buzz" : "";
         return result.empty() ? std::to_string(n) : result;
-      });
-
-  si::IteratorWrapper begin{fizzbuzz.iterator()};
-  si::IteratorWrapper<decltype(fizzbuzz.iterator())> end{};
-
-  std::vector<std::string> const result{begin, end};
+      })
+      << si::collect<std::vector<std::string>>();
 
   EXPECT_EQ(result, expected);
 }
@@ -96,7 +88,7 @@ TEST(IteratorTests, TryReadingFromEndIterator)
 {
   si::IteratorWrapper<DummyIterator> end{};
   EXPECT_THROW(*end, si::no_such_element_exception);
-  EXPECT_THROW(end->value, si::no_such_element_exception);
+  EXPECT_THROW((void) end->value, si::no_such_element_exception);
 }
 
 TEST(IteratorTests, DereferenceStructure)

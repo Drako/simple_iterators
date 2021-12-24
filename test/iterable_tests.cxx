@@ -77,8 +77,7 @@ TEST(IterableTests, LegacyWrapperRawArray)
 
   si::iterate(source)
       << si::indexed()
-      << si::for_each([&results](std::pair<std::size_t, int> p) {
-        auto const[idx, n] = p;
+      << si::for_each([&results](std::size_t idx, int n) {
         results[idx] = n;
       });
 
@@ -88,7 +87,7 @@ TEST(IterableTests, LegacyWrapperRawArray)
 TEST(IterableTests, LegacyWrapperPointers)
 {
   char const* argv[] = {"alpha", "bravo", "charlie"};
-  std::list const expected{"alpha", "bravo", "charlie"};
+  std::list<char const*> const expected{argv+0, argv+3};
   std::list<char const*> results;
 
   si::iterate(+argv, argv+3)
@@ -105,12 +104,9 @@ TEST(IterableTests, LegacyWrapperString)
 
   std::string const source{"hello world!"};
   std::string const expected{"HELLO WORLD!"};
-  std::string result;
-
-  si::iterate(source)
+  std::string const result = si::iterate(source)
       << si::map([](char c) { return std::toupper(c); })
-      // just to test if it would work... don't actually use std::bind
-      << si::for_each([&result](char c) { result.push_back(c); });
+      << si::collect();
 
   EXPECT_EQ(result, expected);
 }
@@ -125,11 +121,9 @@ TEST(IterableTests, LegacyWrapperUnorderedMap)
   using kv = decltype(source)::value_type;
 
   std::set const expected{42, 23, 1337};
-  std::set<int> result;
-
-  si::iterate(source)
-      << si::map([](kv const& p) { return p.second; })
-      << si::for_each([&result](int n) { result.insert(n); });
+  std::set<int> const result = si::iterate(source)
+      << si::map_field(&kv::second)
+      << si::collect();
 
   EXPECT_EQ(result, expected);
 }

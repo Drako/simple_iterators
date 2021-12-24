@@ -27,6 +27,14 @@ namespace si {
   {
     return detail::ForEach<C>{c};
   }
+
+  template<BinaryConsumer BC>
+  inline auto for_each(BC const& bc)
+  {
+    using first = typename detail::CallableTraits<BC>::template argument_type<0u>;
+    using second = typename detail::CallableTraits<BC>::template argument_type<1u>;
+    return for_each([bc](std::pair<first, second> const& p) { bc(p.first, p.second); });
+  }
 }
 
 #endif // SI_ALGORITHMS_FOR_EACH_HXX

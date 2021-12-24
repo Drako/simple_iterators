@@ -84,10 +84,12 @@ namespace si {
     return detail::Filter<P>{p};
   }
 
-  template<Predicate P>
-  inline auto copy_if(P const& p)
+  template<BinaryPredicate BP>
+  inline auto filter(BP const& bp)
   {
-    return detail::Filter<P>{p};
+    using first = typename detail::CallableTraits<BP>::template argument_type<0u>;
+    using second = typename detail::CallableTraits<BP>::template argument_type<1u>;
+    return filter([bp](std::pair<first, second> const& p) { return bp(p.first, p.second); });
   }
 }
 

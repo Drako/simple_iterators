@@ -72,13 +72,13 @@ namespace si {
     }
   }
 
-  inline auto drop(unsigned n)
+  inline auto drop(std::size_t const n)
   {
     // technically this is not a "drop n, take all" but a "drop n, take SIZE_T_MAX", but that should be sufficient
     return detail::DropTake{n, std::numeric_limits<std::size_t>::max()};
   }
 
-  inline auto take(unsigned n)
+  inline auto take(std::size_t const n)
   {
     return detail::DropTake{0u, n};
   }

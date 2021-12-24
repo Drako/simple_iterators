@@ -69,12 +69,12 @@ namespace si {
       A aggregator;
     };
 
-    template<Iterable I, Aggregator A>
-    inline auto operator<<(I const& i, ZipWithNextMap<A> const& a)
+    template<Iterable I, BinaryMapper BM>
+    inline auto operator<<(I const& i, ZipWithNextMap<BM> const& bm)
     {
       using Source = decltype(i.iterator().next());
 
-      auto const mapper = [a](std::pair<Source, Source> p) { return a.aggregator(p.first, p.second); };
+      auto const mapper = [bm](std::pair<Source, Source> p) { return bm.aggregator(p.first, p.second); };
       return i << ZipWithNext{} << Map<decltype(mapper)>{mapper};
     }
   }
