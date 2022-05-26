@@ -1,3 +1,5 @@
+FetchContent_MakeAvailable(GoogleTest)
+
 add_executable(si_tests
     iterator_tests.cxx
     iterable_tests.cxx
