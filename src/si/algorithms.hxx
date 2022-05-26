@@ -7,6 +7,7 @@
 #include "algorithms/count.hxx"
 #include "algorithms/drop_take.hxx"
 #include "algorithms/filter.hxx"
+#include "algorithms/first.hxx"
 #include "algorithms/for_each.hxx"
 #include "algorithms/indexed.hxx"
 #include "algorithms/map.hxx"

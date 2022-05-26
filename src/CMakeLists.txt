@@ -8,6 +8,7 @@ add_library(si STATIC
     si/algorithms/count.hxx
     si/algorithms/drop_take.hxx
     si/algorithms/filter.hxx
+    si/algorithms/first.hxx
     si/algorithms/for_each.hxx
     si/algorithms/indexed.hxx
     si/algorithms/map.hxx
@@ -16,4 +17,4 @@ add_library(si STATIC
     si/exceptions.hxx si/exceptions.cxx
     si/range.hxx
     )
-target_include_directories(si INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/)
+target_include_directories(si INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/")

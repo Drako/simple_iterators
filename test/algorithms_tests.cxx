@@ -238,9 +238,19 @@ TEST(AlgorithmsTests, Indexed)
       << si::take(3u)
       << si::indexed()
       << si::for_each([&results](std::pair<std::size_t, int> p) {
-        auto const[idx, n] = p;
+        auto const [idx, n] = p;
         results.emplace_back(idx, n);
       });
 
   EXPECT_EQ(results, expected);
+}
+
+TEST(AlgorithmsTests, First)
+{
+  auto const is_even = [](int const n) { return (n & 1)==0; };
+
+  int const answer = (IntRange{41, 43}
+      << si::filter(is_even)
+      << si::first()).value();
+  EXPECT_EQ(answer, 42);
 }
