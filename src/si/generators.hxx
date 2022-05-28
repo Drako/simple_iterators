@@ -8,26 +8,17 @@
 #include "callables.hxx"
 #include "exceptions.hxx"
 #include "iterable.hxx"
+#include "traits.hxx"
 
 namespace si {
   template<typename T>
   concept Generator = Producer<T>;
 
   namespace detail {
-    template<typename T>
-    struct RemoveOptional {
-      using type = T;
-    };
-
-    template<typename T>
-    struct RemoveOptional<std::optional<T>> {
-      using type = T;
-    };
-
     template<Generator G>
     class GeneratingIterator final {
       G generator;
-      using T = typename RemoveOptional<decltype(generator())>::type;
+      using T = RemoveOptionalT<decltype(generator())>;
 
       std::optional<T> value;
 

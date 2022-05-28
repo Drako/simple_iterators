@@ -5,8 +5,11 @@
 
 #include "../exceptions.hxx"
 #include "../iterable.hxx"
+#include "../traits.hxx"
+#include "map.hxx"
 
 #include <optional>
+#include <utility>
 
 namespace si {
   namespace detail {
@@ -76,6 +79,44 @@ namespace si {
     {
       return Filtering<decltype(i.iterator()), P>{i.iterator(), f.predicate};
     }
+
+    struct FilterHasValue final {
+    };
+
+    template<Iterable I>
+    inline auto operator<<(I const& i, FilterHasValue)
+    {
+      using value_type = decltype(i.iterator().next());
+
+      if constexpr(IsOptionalV<value_type>) {
+        auto const predicate = [](value_type const& v) {
+          return v.has_value();
+        };
+        auto const mapper = [](value_type v) {
+          return std::move(*v);
+        };
+
+        using F = Filtering<decltype(i.iterator()), decltype(predicate)>;
+        F f{i.iterator(), predicate};
+        using M = Mapping<decltype(f.iterator()), decltype(mapper)>;
+        return M{f.iterator(), mapper};
+      }
+      else {
+        // no op in case of non-optional
+        return i;
+      }
+    }
+
+    template<Mapper M>
+    struct FilterMap final {
+      M mapper;
+    };
+
+    template<Iterable I, Mapper M>
+    inline auto operator<<(I const& i, FilterMap<M> const& fm)
+    {
+      return i << map(fm.mapper) << FilterHasValue{};
+    }
   }
 
   template<Predicate P>
@@ -90,6 +131,17 @@ namespace si {
     using first = typename detail::CallableTraits<BP>::template argument_type<0u>;
     using second = typename detail::CallableTraits<BP>::template argument_type<1u>;
     return filter([bp](std::pair<first, second> const& p) { return bp(p.first, p.second); });
+  }
+
+  inline auto filter_has_value()
+  {
+    return detail::FilterHasValue{};
+  }
+
+  template<Mapper M>
+  inline auto filter_map(M const& m)
+  {
+    return detail::FilterMap<M>{m};
   }
 }
 

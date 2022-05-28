@@ -2,6 +2,7 @@
 
 #include <si/algorithms.hxx>
 
+#include <cmath>
 #include <string>
 #include <vector>
 
@@ -253,4 +254,22 @@ TEST(AlgorithmsTests, First)
       << si::filter(is_even)
       << si::first()).value();
   EXPECT_EQ(answer, 42);
+}
+
+TEST(AlgorithmsTests, FilterMap)
+{
+  std::array input{-9, -4, -1, 0, 1, 4, 9};
+  std::vector<int> results = si::iterate(input)
+      << si::filter_map([](int i) -> std::optional<int> {
+        if (i>=0) {
+          return static_cast<int>(std::sqrt(i));
+        }
+        else {
+          return {};
+        }
+      })
+      << si::collect();
+  std::vector const expected{0, 1, 2, 3};
+
+  EXPECT_EQ(results, expected);
 }

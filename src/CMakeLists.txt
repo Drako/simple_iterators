@@ -16,5 +16,6 @@ add_library(si STATIC
     si/generators.hxx
     si/exceptions.hxx si/exceptions.cxx
     si/range.hxx
+    si/traits.hxx
     )
 target_include_directories(si INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/")
